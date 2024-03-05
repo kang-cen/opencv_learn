@@ -2,7 +2,8 @@
 #include<opencv2/opencv.hpp>
 #include<string>
 
-#include "quickopencv.h"
+// #include "quickopencv.h"
+#include "D:/code/opencv/cvtcolor_imwrite/include/quickopencv.h"
 
 using namespace std;
 using namespace cv;
