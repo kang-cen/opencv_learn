@@ -1,5 +1,4 @@
-// #include "quickopencv.h"
-#include "D:/code/opencv/cvtcolor_imwrite/include/quickopencv.h"
+#include "quickopencv.h"
 
 void QuickDemo::quickopen(cv::Mat image)
 {
