@@ -39,12 +39,12 @@ void QuickDemo::matcreation(cv::Mat image)
     m5=cv::Scalar(0,255,0);  //当Size(400,400)太大了之后output会很慢 所以注释了
     // std::cout<<"after changed m5=cv::Scalar(0,255,0)"<<std::endl<<m5<<std::endl;
 
-    // std::cout<<"当然,自定义的Mat 类型也可以进行显示。"<<std::endl;  cout<<中文会乱码 奇怪
+    std::cout<<"Of course, custom Mat types can also be displayed"<<std::endl;  //cout<<中文会乱码 奇怪
     cv::imshow("output1",m5);
 
     cv::Mat m6=m5;
     m6=cv::Scalar(0,0,255);
-    // std::cout<<"经过赋值操作之后 and  m6=cv::Scalar(0,0,255);让我们看看m6的图像"<<std::endl;
+    std::cout<<"after the assignment operation and m6=cv::Scalar(0,0,255); Let's see an image of the M6"<<std::endl;
     cv::imshow("output2",m6);
 
     cv::Mat kernel=(Mat_<char>(3,3)<<
@@ -54,3 +54,5 @@ void QuickDemo::matcreation(cv::Mat image)
     std::cout<<kernel<<std::endl;
 
 }
+
+

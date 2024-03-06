@@ -11,7 +11,7 @@ int main()
 
         QuickDemo qd;
         // qd.quickopen(src);
-        qd.matcreation(src);
+        // qd.matcreation(src);
 
         cv::waitKey(0);
         cv::destroyAllWindows();
