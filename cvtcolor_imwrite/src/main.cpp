@@ -1,11 +1,7 @@
-#include<iostream>
-#include<opencv2/opencv.hpp>
+
 #include<string>
 
 #include "quickopencv.h"
-
-using namespace std;
-using namespace cv;
 
 int main()
 {
@@ -14,7 +10,8 @@ int main()
         cv::imshow("src",src);
 
         QuickDemo qd;
-        qd.quickopen(src);
+        // qd.quickopen(src);
+        qd.matcreation(src);
 
         cv::waitKey(0);
         cv::destroyAllWindows();
