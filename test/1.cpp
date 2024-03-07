@@ -1,43 +1,16 @@
 #include<iostream>
-#include<opencv2/opencv.hpp>
-#include<string>
-
-
 using namespace std;
-using namespace cv;
-
-class QuickDemo
-{
-    public:
-        cv::Mat gray,hsv;
-        void quickopen(cv::Mat image);
-        
-};
-
-void QuickDemo::quickopen(cv::Mat image)
-{
-    cv::cvtColor(image,gray,cv::COLOR_BGR2GRAY);
-    cv::cvtColor(image,hsv,cv::COLOR_BGR2HSV);
-    imshow("gray",gray);
-    imshow("hsv",hsv);
-
-    imwrite("C:\\Users\\33088\\Pictures\\Camera Roll\\smile_hsv.jpg",hsv);
-    imwrite("C:\\Users\\33088\\Pictures\\Camera Roll\\smile_gray.jpg",gray);
-
-
-}
 
 int main()
 {
-        String str="C:\\Users\\33088\\Pictures\\Camera Roll\\smile.jpg";
-        cv::Mat src=cv::imread(str);
-        cv::imshow("src",src);
-
-        QuickDemo qd;
-        qd.quickopen(src);
-
-        cv::waitKey(0);
-        cv::destroyAllWindows();
+        int a[5]={1,2,3,4,5};
+        int* ptr=a;
+        for(int i=0;i<5;i++)
+        {
+            *ptr++=a[i];//先用后++，那么++什么呢？应该是++地址 所以指向下一位
+            cout<<"i= "<<i<<"  ptr value  "<<*ptr<<endl;
+            cout<<"a["<<i<<"]="<<a[i]<<endl;
+        }
         return 0;
 
 }
