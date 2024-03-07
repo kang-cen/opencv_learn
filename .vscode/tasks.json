@@ -9,7 +9,7 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 "${file}",
-                "${workspaceFolder}/cvtcolor_imwrite/src/quickdemo.cpp", 
+                "${workspaceFolder}/cvtcolor_imwrite/src/quickopencv.cpp", 
                 "-I",
                 // "D:\\code\\opencv\\cvtcolor_imwrite\\include",// 添加头文件路径
                 "${workspaceFolder}/cvtcolor_imwrite/include",// 添加头文件路径  任选一个
