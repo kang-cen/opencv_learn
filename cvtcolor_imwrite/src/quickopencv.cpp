@@ -121,7 +121,7 @@ void QuickDemo::tracking_bar(cv::Mat& image)//通过滑动条，来调节图像�
     addorsub_src_bar=Mat::zeros(image.size(),image.type());
     src_bar=image;//赋值，其实改变的就是image原图
     int max_value=100;
-    createTrackbar("value bar ji'dan:", "value modify", &value, max_value,value_change);
+    createTrackbar("value bar:", "value modify", &value, max_value,value_change);
     //必须得写，如果不写根本就不运行。因为只有滑动时才会回调，也就是先要创建窗口才行。不然根本就不运行回调函数
     value_change(50,0);
     
