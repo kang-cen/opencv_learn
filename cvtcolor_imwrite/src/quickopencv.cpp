@@ -85,25 +85,38 @@ void QuickDemo::pixel_visit(cv::Mat& image)//实现图像的逆变换操作
     imshow("changed src image",image);
 }
 
-int value=50;//变量的定义与初始化
-cv::Mat src_bar,addorsub_src_bar,dst_bar;//用于亮度条滑动的矩阵
-void value_change(int ,void*)
+cv::Mat src_bar,src1_bar;
+void light_change(int b,void* userdata)
 {   
-    if(value>50)
+    //pos 表示滑动条的当前位置，userdata 表示用户自定义数据
+    // void onChange(int pos, void* userdata);
+    Mat dst_bar=Mat::zeros(src_bar.size(),src_bar.type());
+    Mat addorsub_src_bar=Mat::zeros(src_bar.size(),src_bar.type());
+    if(b>50)
     {
-        addorsub_src_bar=cv::Scalar(value-50,value-50,value-50);
-        add(src_bar,addorsub_src_bar,dst_bar);
+        addWeighted(src_bar,1,addorsub_src_bar,0,b-50,dst_bar);
     }
-    if(value<50)
+    if(b<50)
     {
-        addorsub_src_bar=cv::Scalar(50-value,50-value,50-value);
-        subtract(src_bar,addorsub_src_bar,dst_bar);
+        addWeighted(src_bar,1,addorsub_src_bar,0,b-50,dst_bar);
     }
-    if(value==50)
+    if(b==50)
     {  
         dst_bar=src_bar.clone();
     }
-    imshow("value modify",dst_bar);
+    imshow("light_contrast modify",dst_bar);
+
+}
+
+void contrast_change(int b,void* userdata)
+{   
+    //亮度是给原图像像素都加减同一个值，而对比度 是给像素乘以或除以一个值  白的越白，黑的越黑
+    //addWeighted(src1,alpha,src2,beta,gama,dst)   src1*alpha+src2*beta+gama=dst
+    Mat dst_bar=Mat::zeros(src1_bar.size(),src1_bar.type());
+    Mat mulordiv_src_bar=Mat::zeros(src1_bar.size(),src1_bar.type());
+    double alpha=b/100.0;// 109/100=1 ; 109/100.0=1.09
+    addWeighted(src1_bar,alpha,mulordiv_src_bar,0,0,dst_bar);
+    imshow("light_contrast modify",dst_bar);
 
 }
 
@@ -115,15 +128,67 @@ void QuickDemo::tracking_bar(cv::Mat& image)//通过滑动条，来调节图像�
 // - `count`：滑动条的最大值
 // - `onChange`：当滑动条的值改变时调用的回调函数
 // - `userdata`：传递给回调函数的数据
-
-    cv::namedWindow("value modify",cv::WINDOW_FREERATIO);
-    dst_bar=Mat::zeros(image.size(),image.type());
-    addorsub_src_bar=Mat::zeros(image.size(),image.type());
-    src_bar=image;//赋值，其实改变的就是image原图
+    src_bar=image.clone();
+    src1_bar=image.clone();
+    cv::namedWindow("light_contrast modify",cv::WINDOW_FREERATIO);//如果没有这条语句 会没有滑动条
+    int value=50;//亮度
     int max_value=100;
-    createTrackbar("value bar:", "value modify", &value, max_value,value_change);
-    //必须得写，如果不写根本就不运行。因为只有滑动时才会回调，也就是先要创建窗口才行。不然根本就不运行回调函数
-    value_change(50,0);
+    int contrast=100;//对比度
+    int max_contrast=200;
+    //先用这个函数在窗口上创建一个滑动条，但是不会display图片 因为当滑动条的值未改变
+    //不会运行light_change,所以需要在下面写一个light_change函数
+    //当滑动条值改变时会调用light_change函数而且会 把value传给pos
+    createTrackbar("light bar:", "light_contrast modify", &value, max_value,light_change);
+    createTrackbar("contrast bar:", "light_contrast modify",&contrast, max_contrast,contrast_change);
+    light_change(50,0);//先用这个函数初始化图片
+}
+
+void QuickDemo::key_control(cv::Mat& image)
+{
+    Mat dst;
+    int index=0;
+    while(true)
+    {
+        //当等待时间内无任何操作，返回-1  有字符输入时，返回字符ASCII码对应的十进制值
+        //鼠标必须激活当前窗口, 即鼠标要点一下窗口，不然要是放在cmd窗口，无法键入字符
+        char k=cv::waitKey(1000);//等待1s
+        if(k==27)
+            break;
+        applyColorMap(image,dst,colormap[index%20]);
+        index++;
+        namedWindow("key control",WINDOW_FREERATIO);
+        imshow("key control",dst);
+    }
+}
+
+void QuickDemo::bitwise_operate(cv::Mat& image)
+{
+    cv::Mat m1,m2,dst;
+    m1=Mat::zeros(Size(256,256),CV_8UC3);
+    m2=Mat::zeros(Size(256,256),CV_8UC3);
+//     void cv::rectangle	(	
+// InputOutputArray 	img, 参数 img 输入图像。
+// Rect 	rec,参数 rec 绘制矩形的规格 顶点(左上角)，宽，高
+// const Scalar & 	color, 参数color 矩形颜色或亮度（灰度图像）。
+// int 	thickness = 1,构成矩形的线条的厚度。负值意味着函数必须绘制一个填充矩形。
+// int 	lineType = LINE_8, 参数lineType 线的类型
+// int 	shift = 0 参数shift 点坐标中的小数位数
+// )	
+    rectangle(m1,Rect(100,100,80,80),Scalar(255,255,0),-1,0);//-1表示填充 
+    rectangle(m2,Rect(150,150,80,80),Scalar(255,0,255),-1,0);
+    imshow("m1",m1);
+    imshow("m2",m2);
+    bitwise_and(m1,m2,dst);//(255,0,0)交叉区域蓝色
+    imshow("bitwise_and",dst);
+    bitwise_or(m1,m2,dst);//(255,255,255)交叉区域白色 
+    imshow("bitwise_or",dst);
+    bitwise_not(image,dst);//取反
+    namedWindow("bitwise_not",WINDOW_FREERATIO);
+    imshow("bitwise_not",dst);
+    bitwise_xor(m1,m2,dst);//异或（0，255，255）
+    imshow("bitwise_xor",dst);
+
     
     
+
 }
