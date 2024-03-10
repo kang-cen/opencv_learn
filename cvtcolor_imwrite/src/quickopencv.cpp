@@ -247,3 +247,49 @@ cv::InputArray upperb, cv::OutputArray dst)
     imshow("bg changed",bg);
 
 }
+
+void QuickDemo::pixel_static(cv::Mat& image)
+{
+    /*
+    cv::minMaxLoc()`函数用于查找矩阵中的最小值和最大值，以及它们对应的位置（索引）
+    void cv::minMaxLoc(const cv::Mat& src, double* minVal, double* maxVal=0, cv::Point* minLoc=0, 
+    cv::Point* maxLoc=0, const cv::Mat& mask=cv::Mat())
+        `src`：输入的  单通道矩阵 （例如灰度图像）
+        - `minVal`：指向输出的最小值的指针（可选参数）
+        - `maxVal`：指向输出的最大值的指针（可选参数）
+        - `minLoc`：指向输出的最小值位置的指针（可选参数）
+        - `maxLoc`：指向输出的最大值位置的指针（可选参数）
+        - `mask`：可选参数，用于指定要考虑的非零掩码区域（默认为一个空矩阵） 
+
+
+    void cv::meanStdDev(cv::InputArray src, cv::OutputArray mean, cv::OutputArray stddev,
+     cv::InputArray mask = noArray()) 计算均值和标准差
+
+    OutputArray 是 OpenCV 中定义的一个类，用于表示输出数据的容器。它可以用来表示用于接收函数输出数据
+    的数组或矩阵。`OutputArray` 类型可以接受不同类型的数据结构，如 `cv::Mat`, `cv::UMat`, `cv::GpuMat` 等
+
+    `OutputArray` 可以通过 `at` 方法来访问输出数据。
+    */
+
+   double min_value,max_value;
+   cv::Mat mean_value,std_value;
+   Point min_loc,max_loc;
+   std::vector<Mat> mv;//用于接收单通道
+   split(image,mv);
+   for(int i=0;i<3;i++)
+   {
+    minMaxLoc(mv[i],&min_value,&max_value,&min_loc,&max_loc);
+    // meanStdDev(mv[i],mean_value,std_value);  可以单个通道操作，也可以一起操作
+    std::cout<<"mv["<<i<<"]"<<"min_value:"<<min_value<<std::endl;
+    std::cout<<"mv["<<i<<"]"<<"max_value:"<<max_value<<std::endl;
+    std::cout<<"mv["<<i<<"]"<<"min_loc:"<<min_loc<<std::endl;
+    std::cout<<"mv["<<i<<"]"<<"max_loc:"<<min_loc<<std::endl;
+    std::cout<<std::endl;
+   }
+    meanStdDev(image,mean_value,std_value);//标准差越小，图像的有效信息越少，如果方差很小的话，可能是什么噪声
+    std::cout<<"channnel 1   "<<"mean_value:"<<mean_value.at<double>(0,0)<<"  sta_value:"<<std_value.at<double>(0,0)<<endl;
+    std::cout<<"channnel 2   "<<"mean_value:"<<mean_value.at<double>(1,0)<<"  sta_value:"<<std_value.at<double>(1,0)<<endl;
+    std::cout<<"channnel 3   "<<"mean_value:"<<mean_value.at<double>(2,0)<<"  sta_value:"<<std_value.at<double>(2,0)<<endl;
+    std::cout<<"mean_value:"<<mean_value<<endl<<"sta_value"<<std_value<<endl; // 这样是输出一个矩阵
+
+}

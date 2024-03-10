@@ -6,7 +6,7 @@
 int main()
 {
         
-        String str="C:\\Users\\33088\\Pictures\\Camera Roll\\lvmu.jpg";
+        String str="C:\\Users\\33088\\Pictures\\Camera Roll\\greenback.jpg";
         cv::Mat src=cv::imread(str);
         // cv::namedWindow("src",cv::WINDOW_FREERATIO);
         cv::imshow("src",src);
@@ -19,7 +19,8 @@ int main()
         // qd.key_control(src);
         // qd.bitwise_operate(src);
         // qd.channels_operate(src);
-        qd.inRange_demo(src);
+        // qd.inRange_demo(src);
+        qd.pixel_static(src);
         cv::waitKey();
         // cv::destroyAllWindows();
         return 0;

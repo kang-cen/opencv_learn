@@ -40,5 +40,6 @@ class QuickDemo
         void bitwise_operate(cv::Mat& image);
         void channels_operate(cv::Mat& image);
         void inRange_demo(cv::Mat& image);
+        void pixel_static(cv::Mat& image);
 };
 #endif
