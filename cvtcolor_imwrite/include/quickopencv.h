@@ -38,6 +38,7 @@ class QuickDemo
         void tracking_bar(cv::Mat& image);
         void key_control(cv::Mat& image);
         void bitwise_operate(cv::Mat& image);
-
+        void channels_operate(cv::Mat& image);
+        void inRange_demo(cv::Mat& image);
 };
 #endif

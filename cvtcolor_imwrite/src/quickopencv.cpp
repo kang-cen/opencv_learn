@@ -192,3 +192,58 @@ void QuickDemo::bitwise_operate(cv::Mat& image)
     
 
 }
+
+void QuickDemo::channels_operate(cv::Mat& image)
+{
+    std::vector<Mat> single;//建立一个能够存放Mat类型的数组
+    Mat dst;
+    split(image,single);
+    cv::namedWindow("blue",cv::WINDOW_FREERATIO);
+    cv::namedWindow("green",cv::WINDOW_FREERATIO);
+    cv::namedWindow("red",cv::WINDOW_FREERATIO);
+    cv::namedWindow("blue after merge",cv::WINDOW_FREERATIO);
+    cv::namedWindow("channels changed",cv::WINDOW_FREERATIO);
+
+    imshow("blue",single[0]);
+    imshow("green",single[1]);
+    imshow("red",single[2]);
+//以三通道形式显示单通道内容  蓝色
+    single[1]=0;
+    single[2]=0;
+    cv::merge(single,dst);
+    imshow("blue after merge",dst);
+//通道改变
+    int from_to[]={0,2,1,1,2,0};
+    //void cv::mixChannels(const Mat* src, int nsrcs, Mat* dst, int ndsts, const int* fromTo, int npairs)
+    cv::mixChannels(&image,1,&dst,1,from_to,3);
+    cv::imwrite("C:\\Users\\33088\\Pictures\\Camera Roll\\flower_RGB.jpg",dst);
+    imshow("channels changed",dst);
+
+}
+
+void QuickDemo::inRange_demo(cv::Mat& image)
+{
+    //实现背景抠图
+    cvtColor(image,hsv,COLOR_BGR2HSV);
+    cv::Mat masked=Mat::zeros(image.size(),image.type());
+/*
+void cv::inRange(cv::InputArray src, cv::InputArray lowerb, 
+cv::InputArray upperb, cv::OutputArray dst)
+用于根据指定的上限和下限阈值对输入图像的像素值进行范围筛选，生成一个二值化图像。
+- `src` 是输入图像。
+- `lowerb` 是包含低阈值的数组或标量。如果输入图像中的像素值大于等于 `lowerb`，则被认为是目标像素。
+`upperb` 是包含高阈值的数组或标量。如果输入图像中的像素值小于 `upperb`，则被认为是目标像素。
+- `dst` 是输出的二值化图像，与输入图像具有相同的尺寸与类型。
+*/
+    std::cout<<"reference table"<<std::endl;
+    Mat rt=imread("C:\\Users\\33088\\Pictures\\Camera Roll\\reference.jpg");
+    imshow("reference table",rt);
+    inRange(hsv,Scalar(35,43,46),Scalar(77,255,255),masked);//从hsv中提取区域 白色为目标区域 黑色为背景
+    imshow("masked",masked);
+    bitwise_not(masked,masked);//提取物体/人物
+    Mat bg=Mat::zeros(image.size(),image.type());
+    bg=Scalar(40,40,250);
+    image.copyTo(bg,masked);//ROI区域是人脸部分  将image图像拷贝到bg的masked区域，其余区域不变
+    imshow("bg changed",bg);
+
+}
