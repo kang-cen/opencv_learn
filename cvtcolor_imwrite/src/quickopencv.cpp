@@ -187,10 +187,6 @@ void QuickDemo::bitwise_operate(cv::Mat& image)
     imshow("bitwise_not",dst);
     bitwise_xor(m1,m2,dst);//异或（0，255，255）
     imshow("bitwise_xor",dst);
-
-    
-    
-
 }
 
 void QuickDemo::channels_operate(cv::Mat& image)
@@ -293,3 +289,198 @@ void QuickDemo::pixel_static(cv::Mat& image)
     std::cout<<"mean_value:"<<mean_value<<endl<<"sta_value"<<std_value<<endl; // 这样是输出一个矩阵
 
 }
+
+void QuickDemo::geometry_draw(cv::Mat& image)
+{
+    /*
+    rectange 绘制矩形       circle 绘制⚪
+    line 绘制直线           ellipse 绘制椭圆
+
+    img—绘制的椭圆所在的图像。
+center—椭圆的中心坐标。
+axes—椭圆的长半轴和短半轴的长度。  长——横，短——竖
+angle—椭圆旋转的角度，单位为度。  整个椭圆旋转角度 顺时针旋转
+startAngle—椭圆孤起始的角度，单位为度。 0，360 可以画一个完整的椭圆
+endAngle—椭圆弧终止的角度，单位为度。
+color—线条的颜色，用三通道表示。
+thickness—线条的粗细，默认值为1。
+lineType—线条的类型，默认值为LINE_8。
+shift—坐标值的小数位数。
+
+    */
+    cv::Mat bg=Mat::zeros(Size(500,500),image.type());
+    bg=Scalar(255,255,255);
+    rectangle(bg,Rect(200,200,100,100),Scalar(0,0,0),2,8,0);
+    circle(bg,Point(250,250),50,Scalar(0,0,0),2,8,0);
+    line(bg,Point(200,200),Point(300,300),Scalar(0,0,0),1,8,0);
+    ellipse(bg,Point(250,250),Size(100,60),0,0,360,Scalar(0,0,0),1,8,0);
+    ellipse(bg,Point(250,250),Size(60,100),0,0,360,Scalar(0,0,0),1,8,0);
+    ellipse(bg,Point(250,250),Size(100,60),30,0,360,Scalar(0,0,0),1,8,0);
+    ellipse(bg,Point(250,250),Size(60,100),30,0,360,Scalar(0,0,0),1,8,0);
+
+
+    imshow("geometry",bg);
+}
+
+void QuickDemo::random_draw()
+{
+    //opencv中的随机数以及如何利用随机数去实现随机颜色
+    //rng.uniform(a,b) 实现a-b之间的均匀分布数
+    RNG rng(12345);//如果放到循环里面只有一个椭圆可能是因为 放进去了之后，时间都是同一个
+    Mat bg=Mat::zeros(Size(500,500),CV_8UC3);
+    while(true)
+    {
+        if(waitKey(10)==27)
+            break;
+        double x=rng.uniform(100,400);
+        double y=rng.uniform(100,400);
+        double angel=rng.uniform(0,360);
+        int b=rng.uniform(0,255);
+        int g=rng.uniform(0,255);
+        int r=rng.uniform(0,255);
+        ellipse(bg,Point(x,y),Size(100,50),angel,0,360,Scalar(b,g,r),1,LINE_AA,0);
+        imshow("randome ellipse",bg);
+    }
+   
+}
+
+void QuickDemo::draw_polygon()
+{
+    /*
+    drawContours( InputOutputArray image, InputArrayOfArrays contours,
+                              int contourIdx, const Scalar& color,
+                              int thickness = 1, int lineType = LINE_8,
+                              InputArray hierarchy = noArray(),
+                              int maxLevel = INT_MAX, Point offset = Point() );
+
+    contours 待画的轮廓 是一个二维数组，外维存储轮廓，内维存储轮廓构成的点
+    contourIdx  画第几个轮廓,负数表示全部画上
+    thickness  正数表示线宽，负数表示填充
+    */
+    Mat bg=Mat::zeros(Size(500,500),CV_8UC3);
+    Point pt1(100,100);
+    Point pt2(100,400);
+    Point pt3(250,450);
+    Point pt4(400,400);
+    Point pt5(400,100);
+    std::vector<Point>pt;//一个图形
+    std::vector<std::vector<Point>> multi_poly;//polyline可以是一个图形也可以是多个图形。多个图形如何定义
+    pt.push_back(pt1);
+    pt.push_back(pt2);
+    pt.push_back(pt3);
+    pt.push_back(pt4);
+    pt.push_back(pt5);
+    multi_poly.push_back(pt);
+    // polylines(bg,multi_poly,true,Scalar(255,255,255),2,LINE_AA,0);//划线，thickness只能大于等于1
+    // fillPoly(bg,multi_poly,Scalar(255,255,255),LINE_AA,0);//填充，
+
+    //drawContours()函数既可以解决多边形图像的画线与填充问题
+    drawContours(bg,multi_poly,-1,Scalar(255,255,255),1,LINE_AA);//第二个参数只能是图形数组，如果是单个图形会报错，而且这个错误极难发现，只是会闪退。不会有错误提示
+
+    imshow("polygon",bg);
+}
+
+Point sp(-1,-1),ep(-1,-1);
+Mat temp;
+void onmouse(int event, int x, int y, int flags, void* userdata)
+{
+    Mat image=*((Mat*)userdata);
+    if(event==EVENT_LBUTTONDOWN)//当mouse press ,event=1
+    {
+        sp.x=x;
+        sp.y=y;
+        cout<<"start point:"<<sp<<endl;
+    }
+
+    if(event==EVENT_MOUSEMOVE)//当mouse press and mouse move,event=0  即每次只能响应一次。move优先级高
+    {
+        if(sp.x>=0)//鼠标左键按下去的时候才绘制图形
+        {
+            if((x-sp.x)>0 and (y-sp.y)>0)
+            {
+                Rect rect(sp.x,sp.y,abs(x-sp.x),abs(y-sp.y));
+                temp.copyTo(image);//可以起到擦除前一次绘制图像的作用
+                rectangle(image,rect,Scalar(0,0,255),10,LINE_AA,0);
+                imshow("mouse monitor",image);
+            }
+            if((x-sp.x)<0 and (y-sp.y)>0)
+            {
+                Rect rect(x,sp.y,abs(x-sp.x),abs(y-sp.y));
+                temp.copyTo(image);//可以起到擦除前一次绘制图像的作用
+                rectangle(image,rect,Scalar(0,0,255),10,LINE_AA,0);
+                imshow("mouse monitor",image);
+            }
+                
+            if((x-sp.x)<0 and (y-sp.y)<0)
+            {
+                Rect rect(x,y,abs(x-sp.x),abs(y-sp.y));
+                temp.copyTo(image);//可以起到擦除前一次绘制图像的作用
+                rectangle(image,rect,Scalar(0,0,255),10,LINE_AA,0);
+                imshow("mouse monitor",image);
+            }
+                
+            if((x-sp.x)>0 and (y-sp.y)<0)
+            {
+                Rect rect(sp.x,y,abs(x-sp.x),abs(y-sp.y));
+                temp.copyTo(image);//可以起到擦除前一次绘制图像的作用
+                rectangle(image,rect,Scalar(0,0,255),10,LINE_AA,0);
+                imshow("mouse monitor",image);
+
+            }
+            // temp.copyTo(image);//可以起到擦除前一次绘制图像的作用
+            // rectangle(image,rect,Scalar(0,0,255),10,LINE_AA,0);
+            // imshow("mouse monitor",image);
+
+        }
+    }
+
+    if(event==EVENT_LBUTTONUP)
+    {
+        Mat koutu;
+        ep.x=x;
+        ep.y=y;
+        cout<<"end point:"<<ep<<endl;
+        cout<<"width: "<<abs(ep.x-sp.x)<<"  height: "<<abs(ep.y-sp.y)<<endl;
+        namedWindow("koutu",WINDOW_FREERATIO);
+        if((x-sp.x)>0 and (y-sp.y)>0)
+            {
+                Rect rect(sp.x,sp.y,abs(x-sp.x),abs(y-sp.y));
+                koutu=image(rect);
+                imshow("koutu",koutu);
+            }
+        if((x-sp.x)<0 and (y-sp.y)>0)
+            {
+                Rect rect(x,sp.y,abs(x-sp.x),abs(y-sp.y));
+                koutu=image(rect);
+                imshow("koutu",koutu);
+            }
+                
+        if((x-sp.x)<0 and (y-sp.y)<0)
+            {
+                Rect rect(x,y,abs(x-sp.x),abs(y-sp.y));
+                koutu=image(rect);
+                imshow("koutu",koutu);
+            }
+                
+        if((x-sp.x)>0 and (y-sp.y)<0)
+            {
+                Rect rect(sp.x,y,abs(x-sp.x),abs(y-sp.y));
+                koutu=image(rect);
+                imshow("koutu",koutu);
+
+            }
+        sp.x=-1;
+        sp.y=-1;
+    }
+}
+
+void QuickDemo::mouse_drawing(Mat& image)
+{
+//通过鼠标来实现画矩形
+    cv::namedWindow("mouse monitor",cv::WINDOW_FREERATIO);
+    //为指定窗口设置鼠标处理程序
+    setMouseCallback("mouse monitor",onmouse,(void*)&image);
+    imshow("mouse monitor",image);
+    temp=image.clone();
+}
+

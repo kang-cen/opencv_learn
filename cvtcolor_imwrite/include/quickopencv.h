@@ -41,5 +41,11 @@ class QuickDemo
         void channels_operate(cv::Mat& image);
         void inRange_demo(cv::Mat& image);
         void pixel_static(cv::Mat& image);
+        void geometry_draw(cv::Mat& image);
+        void random_draw();
+        void draw_polygon(); 
+        void mouse_drawing(Mat& image);
+        
 };
+
 #endif
